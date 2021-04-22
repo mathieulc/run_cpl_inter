@@ -1,0 +1,47 @@
+
+#-------------------------------------------------------------------------------
+#                                                                      Restart
+#-------------------------------------------------------------------------------
+# nemo
+	nn=0
+	while [ ${nn} -le $AGRIFZ ]
+	do
+	    [ ${nn} -eq 0 ] && pref="" || pref=${nn}_
+
+#
+# oce restarts
+#
+        ! [ -f ${pref}${CEXPER}_*_restart_oce_0000.nc ] && printf "\n\n  ${pref}${CEXPER}_*_restart_oce_0000.nc not found => we stop...\n\n" && exit 1
+	    for file in ${pref}${CEXPER}_*_restart_oce_????.nc
+	    do
+              ${io_putfile} ${file} ${RESTDIR_OUT}/${pref}restart_oce_${CEXPER}_${DATE_END_JOB}_${file##*_}
+	    done
+
+#
+# obc restarts
+# CHRIS gerer avec IF ln_obc_rstart
+#           ${io_putfile} ${pref}restart.obc.output ${RESTDIR_OUT}/${pref}restart_obc_${CEXPER}_${DATE_END_JOB}
+
+#
+# mld restarts
+#  CHRIS   Repartir de "oce restarts" ci dessus  (tout dans une boucle)
+#	    if [ $TRDMLD -eq 1 ]
+#	    then
+#		for i in ${pref}${CEXPER}_*_restart_mld_????.nc
+#		do
+#		    ${io_putfile} $i ${RESTDIR_OUT}/${pref}restart_mld_${CEXPER}_${DATE_END_JOB}_${i##*_}
+#		done
+#	    fi
+#
+	    nn=$(( ${nn} + 1 ))
+	done
+# ice restarts
+#  CHRIS   Repartir de "oce restarts" ci dessus  (tout dans une boucle)
+#        if [ ${USE_ICE} -eq 1 ] ; then 
+#          for i in ${CEXPER}_*_restart_ice_????.nc
+#          do
+#            ${io_putfile} $i ${RESTDIR_OUT}/restart_ice_${CEXPER}_${DATE_END_JOB}_${i##*_}
+#          done
+#        fi
+
+

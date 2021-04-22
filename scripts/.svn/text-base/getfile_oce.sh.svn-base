@@ -1,0 +1,106 @@
+
+#-------------------------------------------------------------------------------
+#                                                          Configuration files
+#-------------------------------------------------------------------------------
+${io_getfile} ${INPUTDIR}/${DATA}/bathymetry_PERU12_mod2.nc   bathy_meter.nc
+${io_getfile} ${INPUTDIR}/${DATA}/coordinates_PERU12.nc       coordinates.nc
+
+#-------------------------------------------------------------------------------
+#                                            Forcing fields (interannual case)
+#-------------------------------------------------------------------------------
+#!!======================================================================
+#!!            ***  Surface Boundary Condition namelists  ***
+#!!======================================================================
+#!!   namsbc        surface boundary condition
+#!!   namsbc_ana    analytical         formulation
+#!!   namsbc_flx    flux               formulation
+#!!   namsbc_clio   CLIO bulk formulea formulation
+#!!   namsbc_core   CORE bulk formulea formulation
+#!!   namsbc_cpl    CouPLed            formulation                       ('key_coupled')
+#!!   namtra_qsr    penetrative solar radiation
+#!!   namsbc_rnf    river runoffs
+#!!   namsbc_apr      Atmospheric Pressure
+#!!   namsbc_ssr    sea surface restoring term (for T and/or S)
+#!!   namsbc_alb    albedo parameters
+#!!======================================================================
+
+#-------------------------------------------------------------------------------
+# &namsbc_core   !   namsbc_core  CORE bulk formulea
+
+#  Weights (Interpolation On-the-fly)
+#${io_getfile} ${INPUTDIR}/data/reshape_ERAI_PERU12_bilinear_mask.nc    reshape_ERAI_PERU12_bilinear.nc
+ ${io_getfile} ${INPUTDIR}/${DATA}/reshape_ERAI_PERU12_bilinear_mask.nc    reshape_ERAI_PERU12_bilinear.nc
+
+# u10 v10
+${io_getfile} ${INPUTDIR}/${BLK}/${YEAR_BEGIN_JOB}/u10.${YEAR_BEGIN_JOB}.ashei.GLOBAL_075.nc         u10_y${YEAR_BEGIN_JOB}.nc
+${io_getfile} ${INPUTDIR}/${BLK}/${YEAR_BEGIN_JOB}/v10.${YEAR_BEGIN_JOB}.ashei.GLOBAL_075.nc         v10_y${YEAR_BEGIN_JOB}.nc
+
+# radsw radlw
+${io_getfile} ${INPUTDIR}/${BLK}/${YEAR_BEGIN_JOB}/ssrd.${YEAR_BEGIN_JOB}.fshei.GLOBAL_075.nc        radsw_y${YEAR_BEGIN_JOB}.nc
+${io_getfile} ${INPUTDIR}/${BLK}/${YEAR_BEGIN_JOB}/strd.${YEAR_BEGIN_JOB}.fshei.GLOBAL_075.nc        radlw_y${YEAR_BEGIN_JOB}.nc
+
+# q2 t2
+${io_getfile} ${INPUTDIR}/${BLK}/${YEAR_BEGIN_JOB}/q2.${YEAR_BEGIN_JOB}.ashei.GLOBAL_075.nc          q2_y${YEAR_BEGIN_JOB}.nc
+${io_getfile} ${INPUTDIR}/${BLK}/${YEAR_BEGIN_JOB}/t2.${YEAR_BEGIN_JOB}.ashei.GLOBAL_075.nc          t2_y${YEAR_BEGIN_JOB}.nc
+
+# precip
+${io_getfile} ${INPUTDIR}/${BLK}/${YEAR_BEGIN_JOB}/precip.${YEAR_BEGIN_JOB}.fshei.GLOBAL_075.nc      precip_y${YEAR_BEGIN_JOB}.nc
+
+# wspd10      Ou est ce qu'il est lu???????   pour eviter U10^2 + v10^2???
+#${io_getfile} ${INPUTDIR}/${BLK}/${YEAR_BEGIN_JOB}/wspd10.${YEAR_BEGIN_JOB}.ashei.GLOBAL_075.nc      wspd10_y${YEAR_BEGIN_JOB}.nc
+
+
+#-------------------------------------------------------------------------------
+# &namtra_qsr    !   penetrative solar radiation
+${io_getfile} ${INPUTDIR}/${DATA}/chlorophyll_c1m_99_05.nc     chlorophyll.nc
+
+#-------------------------------------------------------------------------------
+# &namsbc_rnf    !   runoffs namelist surface boundary condition
+${io_getfile} ${INPUTDIR}/${DATA}/runoff_PERU12.nc             runoff_1m_nomask.nc
+
+#-------------------------------------------------------------------------------
+# &namsbc_ssr    !   surface boundary condition : sea surface restoring
+${io_getfile} ${INPUTDIR}/${DATA}/sss_1m.nc            sss_1m.nc
+
+#-------------------------------------------------------------------------------
+#   Ajoutés dans la namelist par Stéphane ?!?!?  rappel en temp + un 2eme en sal?
+#-------------------------------------------------------------------------------
+# &namdta_tem    !   surface boundary condition : sea surface restoring
+#  Levitus temperature
+${io_getfile} ${INPUTDIR}/${DATA}/Levitus_p2.1_MONTHLY_Tpot_PERU_ORCA12.nc     dta_temp.nc
+
+# &namdta_sal    !   surface boundary condition : sea surface restoring
+#  Levitus salinity
+${io_getfile} ${INPUTDIR}/${DATA}/Levitus_p2.1_MONTHLY_S_PERU_ORCA12.nc         dta_sal.nc
+
+
+#-------------------------------------------------------------------------------
+#                                                                          OBC 
+#-------------------------------------------------------------------------------
+#!!======================================================================
+#!!               ***  Lateral boundary condition  ***
+#!!======================================================================
+#!!   namlbc        lateral momentum boundary condition
+#!!   namcla        cross land advection
+#!!   namobc        open boundaries parameters                           ('key_obc')
+#!!   namagrif      agrif nested grid ( read by child model only )       ('key_agrif') 
+#!!   nambdy        Unstructured open boundaries                         ('key_bdy')
+#!!   namtide       Tidal forcing at open boundaries                     ('key_bdy_tides')
+#!!======================================================================
+
+#-------------------------------------------------------------------------------
+# &namobc_dta        !   open boundaries input                           ('key_obc')
+
+${io_getfile} ${INPUTDIR}/${OBC}/${YEAR_BEGIN_JOB}/obc_north_U_y${YEAR_BEGIN_JOB}.nc .
+${io_getfile} ${INPUTDIR}/${OBC}/${YEAR_BEGIN_JOB}/obc_north_V_y${YEAR_BEGIN_JOB}.nc .
+${io_getfile} ${INPUTDIR}/${OBC}/${YEAR_BEGIN_JOB}/obc_north_TS_y${YEAR_BEGIN_JOB}.nc .
+
+${io_getfile} ${INPUTDIR}/${OBC}/${YEAR_BEGIN_JOB}/obc_west_U_y${YEAR_BEGIN_JOB}.nc .
+${io_getfile} ${INPUTDIR}/${OBC}/${YEAR_BEGIN_JOB}/obc_west_V_y${YEAR_BEGIN_JOB}.nc .
+${io_getfile} ${INPUTDIR}/${OBC}/${YEAR_BEGIN_JOB}/obc_west_TS_y${YEAR_BEGIN_JOB}.nc .
+
+${io_getfile} ${INPUTDIR}/${OBC}/${YEAR_BEGIN_JOB}/obc_south_U_y${YEAR_BEGIN_JOB}.nc .
+${io_getfile} ${INPUTDIR}/${OBC}/${YEAR_BEGIN_JOB}/obc_south_V_y${YEAR_BEGIN_JOB}.nc .
+${io_getfile} ${INPUTDIR}/${OBC}/${YEAR_BEGIN_JOB}/obc_south_TS_y${YEAR_BEGIN_JOB}.nc .
+
+

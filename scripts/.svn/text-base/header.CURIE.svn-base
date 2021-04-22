@@ -1,0 +1,101 @@
+#===============================================================================
+#                      header to submit a MPI batch job 
+#===============================================================================
+
+# Type ccc_mprun -h for an updated and complete documentation.
+
+#MSUB -r <exp>       # request name
+#MSUB -o <exp>.jobid_%I.txt
+#MSUB -e <exp>.jobid_%I.txt
+#MSUB -j oe          #  VERIFIER que c'est OK sur Curie XXX
+
+#MSUB -c 1           # number of cores per mpi task 
+
+#=======  Thin nodes  (1 node = 2 * 8 procs)
+#MSUB -n 64        # Total number of mpi task to use
+#MSUB -N 5         # number of nodes to use
+#MSUB -T 900        
+# #MSUB -T 54000       # elapsed time limit in seconds   (15 heures)
+
+#=======  Fat  nodes  (1 node = 4 * 8 procs)
+# #MSUB -n 65          # Total number of mpi task to use
+# #MSUB -N 3           # number of nodes to use
+# #MSUB -T 36000       # elapsed time limit in seconds   (10 heures)
+# #MSUB -T 54000       # elapsed time limit in seconds   (15 heures)
+
+#=======  Test
+# #MSUB -n 16        # Total number of mpi task to use
+# #MSUB -N 1         # number of nodes to use
+# #MSUB -T 300       # elapsed time limit in seconds
+
+#MSUB -x             # requests exclusive usage of allocated nodes.
+                     # This is the default configuration for jobs on more that 128 cores.
+
+#  #MSUB -M mem            # required amount of memory per core in Mo
+#  #MSUB -E extra          # extra parameters to pass directly to the underlying resource mgr
+#  #MSUB -K                # only allocates resources. If a program is defined it will be executed only once.
+                          # It would contain ccc_mprun calls to launch parallel commands using the allocated resources.
+#  #MSUB -e ' options '    # additional parameters to pass to the mpirun command
+#  #MSUB -d ddt            # launches the application in debug mode using DDT
+
+
+########   thin nodes:
+#MSUB -q standard       # only for thin nodes 
+# #MSUB -A gch0010           #  facturation "grang challenge" (10 million d'heures)
+#MSUB -A gen6895           #  facturation genci 2013
+
+########   fat nodes: 
+# #MSUB -A ra0542    #  facturation normale 2012 (4 million d'heures)  # termine
+
+#===============================================================================
+
+umask 022
+set -u
+set +x   #  set -x par defaut sur Curie
+
+
+# < insert here variables definitions > !!! DO NOT REMOVE THIS LINE (used by submitjob) !!!
+
+
+#############################   from header.CURIE  #############################
+#===============================================================================
+#  only for CURIE  
+#===============================================================================
+
+#-------------------------------------------------------------------------------
+#  where do we get the input files?
+#-------------------------------------------------------------------------------
+export INPUTDIR="/ccc/scratch/cont005/ra0542/hourdinc/peru12_nemo/inputs/Stephane"
+export      DATA="PERU12-I"
+export      BLK="PERU12-FORCINGS/ERAI"
+export      OBC="PERU12-FORCINGS/OBC/DFS4-B83"
+
+#-------------------------------------------------------------------------------
+#  where do we execute the job?
+#-------------------------------------------------------------------------------
+ export EXEDIR_ROOT="${SCRATCHDIR}/${CONFIG}/execute"
+
+#-------------------------------------------------------------------------------
+#  where do we store the output files?
+#-------------------------------------------------------------------------------
+export OUTPUTDIR_ROOT="${SCRATCHDIR}/${CONFIG}/outputs"
+export   RESTDIR_ROOT="${SCRATCHDIR}/${CONFIG}/restarts"
+
+#-------------------------------------------------------------------------------
+#  To run the models
+#-------------------------------------------------------------------------------
+#export EXEC="time -p ccc_mprun ./nemo.exe"
+#export EXEC="time -p mpirun -np 64  ./nemo.exe"
+ export EXEC="time -p mpirun -np 64  ./nemo.exe  :  -np 1 ./xios_server.exe"
+
+#-------------------------------------------------------------------------------
+#  define the function to get/put files
+#-------------------------------------------------------------------------------
+export io_getfile="lnfile"
+export io_putfile="mvfile"
+
+#-------------------------------------------------------------------------------
+#  Multi-Step
+#-------------------------------------------------------------------------------
+LOADL_STEP_NAME="XXX"
+

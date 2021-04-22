@@ -1,0 +1,68 @@
+#!/bin/bash
+#===============================================================================
+#                      header to submit a MPI batch job 
+#===============================================================================
+
+# Type ccc_mprun -h for an updated and complete documentation.
+
+#MSUB -r <exp>       # request name
+#MSUB -o <exp>.jobid_%I.txt
+#MSUB -e <exp>.jobid_%I.txt
+#MSUB -j oe          #  VERIFIER que c'est OK sur Curie XXX
+#MSUB -n <nmpi>        # Total number of mpi task to use
+#MSUB -T <time_second>        
+#MSUB -x
+#MSUB -q standard  
+#MSUB -A gen6895
+#===============================================================================
+
+umask 022
+set -u
+set +x   #  set -x par defaut sur Curie
+
+
+# < insert here variables definitions > !!! DO NOT REMOVE THIS LINE (used by submitjob) !!!
+
+
+#############################   from header.CURIE  #############################
+#===============================================================================
+#  only for CURIE  
+#===============================================================================
+
+#-------------------------------------------------------------------------------
+#  where do we get the input files?
+#-------------------------------------------------------------------------------
+export INPUTDIRO="/ccc/work/cont005/ra0542/massons/now/input/croco_pech12"
+export INPUTDIRA="/ccc/work/cont005/ra0542/massons/now/input/wrf_pech025l40"
+export INPUTDIRC="/ccc/work/cont005/ra0542/massons/now/input/cow_pech12025"
+
+#-------------------------------------------------------------------------------
+#  where do we execute the job?
+#-------------------------------------------------------------------------------
+ export EXEDIR_ROOT="${SCRATCHDIR}/${CONFIG}/execute"
+
+#-------------------------------------------------------------------------------
+#  where do we store the output files?
+#-------------------------------------------------------------------------------
+export OUTPUTDIR_ROOT="${SCRATCHDIR}/${CONFIG}/outputs"
+export   RESTDIR_ROOT="${SCRATCHDIR}/${CONFIG}/restarts"
+
+#-------------------------------------------------------------------------------
+#  To run the models
+#-------------------------------------------------------------------------------
+#export EXEC="time -p ccc_mprun ./nemo.exe"
+#export EXEC="time -p mpirun -np 64  ./nemo.exe"
+#export EXEC="time -p mpirun -np 64  ./nemo.exe  :  -np 1 ./xios_server.exe"
+#export EXEC="time -p ccc_mprun -n $(( $JPNI * $JPNJ )) ./nemo.exe  :  -n $NXIOS ./xios_server.exe"
+
+#-------------------------------------------------------------------------------
+#  define the function to get/put files
+#-------------------------------------------------------------------------------
+export io_getfile="lnfile"
+export io_putfile="mvfile"
+
+#-------------------------------------------------------------------------------
+#  Multi-Step
+#-------------------------------------------------------------------------------
+LOADL_STEP_NAME="XXX"
+

@@ -1,0 +1,115 @@
+#===============================================================================
+#                      header to submit a MPI batch job 
+#===============================================================================
+#=========== Global directives ===========
+# @ job_name = <exp>
+####### output: attention: nom coherent avec les scripts
+# @ output = <exp>.$(step_name).jobid_$(jobid).txt   
+# @ error = $(output)
+#
+#=========== Step 1 directives ===========
+#============== get_file =================
+# @ step_name = get_file
+# @ job_type = serial
+# @ class = archive
+# @ notification = error
+# @ queue
+#
+#=========== Step 2 directives ===========
+#============= run_model =============
+# @ step_name = run_model
+# @ dependency = (get_file == 0)
+# @ job_type = parallel
+######## @ total_tasks = <totcpu>
+# @ total_tasks = 64
+######## @ wall_clock_limit = <elapsed>
+# @ wall_clock_limit = 00:15:00
+# @ class = debug
+# @ notification = error
+# @ queue
+#
+#=========== Step 3 directives ===========
+#============== put_file =================
+# @ step_name = put_file
+# @ dependency = (run_model == 0)
+# @ job_type = serial
+# @ class = archive
+# @ notification = error
+# @ queue
+
+umask 022
+set -u 
+set +x
+
+# < insert here variables definitions > !!! DO NOT REMOVE THIS LINE (used by submitjob) !!!
+
+#############################  from header.VARGAS  #############################
+#===============================================================================
+#  only for VARGAS  
+#===============================================================================
+export          GROUP=`echo ${USER} |cut -c 2-4`
+
+#-------------------------------------------------------------------------------
+#  where do we get the input files?
+#-------------------------------------------------------------------------------
+export MACHINE_STOCKAGE="ssh gaya"
+
+export INPUTDIR="/u/rech/tij/rtij004/peru12_nemo/inputs/Stephane"
+export      DATA="PERU12-I"
+export      BLK="PERU12-FORCINGS/ERAI"
+export      OBC="PERU12-FORCINGS/OBC/DFS4-B83"
+
+#-------------------------------------------------------------------------------
+#  where do we execute the job?
+#-------------------------------------------------------------------------------
+ export EXEDIR_ROOT="${WORKDIR}/${CONFIG}/execute"
+#export EXEDIR_ROOT="${TMPDIR}"
+
+#-------------------------------------------------------------------------------
+#  where do we store the output files?
+#-------------------------------------------------------------------------------
+export OUTPUTDIR_ROOT="/u/rech/${GROUP}/${USER}/${CONFIG}/outputs"
+export   RESTDIR_ROOT="/u/rech/${GROUP}/${USER}/${CONFIG}/restarts"
+
+#-------------------------------------------------------------------------------
+#  To run the models
+#-------------------------------------------------------------------------------
+export EXEC="time -p ./nemo.exe"
+
+#-------------------------------------------------------------------------------
+#  define the function to get/put files
+#-------------------------------------------------------------------------------
+function mgetfile
+{
+  [ "$#" -ne 2 ] && printf "\n\ncpfile $* \n\n wrong (needs 2 files), we stop...\n\n" && exit 1
+  mfget $1 $2
+  [ `echo $?` != "0" ] && printf "\n\nmgetfile: file $1 is not existing on GAYA, we stop...\n\n" && exit 1
+}
+
+function mputfile
+{
+  [ "$#" -ne 2 ] && printf "\n\ncpfile $* \n\n wrong (needs 2 files), we stop...\n\n" && exit 1
+  [ ! -f $1 ] && printf "\n\nmputfile: file $1 is not existing, we stop...\n\n" && exit 1
+  mfput $1 $2
+}
+
+export -f mgetfile
+export -f mputfile
+
+export io_getfile="mgetfile"
+export io_putfile="mputfile"
+
+#-------------------------------------------------------------------------------
+#  For debugging purpose:
+#-------------------------------------------------------------------------------
+#
+###    -> force the size of I/O buffers to 0 
+###    => make sure you get all informations when model crashes.
+### Warning: To use only if needed because it takes a lot of time
+###
+if [ "${DEBUG}" == "TRUE" ]
+then
+  export XLFRTEOPTS="buffering=disable_all"
+  echo "XLFRTEOPTS : ${XLFRTEOPTS}"
+fi
+

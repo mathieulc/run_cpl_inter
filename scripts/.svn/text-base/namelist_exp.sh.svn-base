@@ -1,0 +1,108 @@
+
+############################# from namelist_exp.sh #############################
+#===============================================================================
+#  Namelist for the experiment
+#===============================================================================
+
+#-------------------------------------------------------------------------------
+#  Config : Ocean - Atmosphere - Coupling
+#-------------------------------------------------------------------------------
+export CONFIG=peru12_nemo
+
+export USE_ATM=0  
+export USE_OCE=1
+export USE_ICE=0
+export USE_CPL=$(( ${USE_ATM} * ${USE_OCE} ))
+export AGRIFZ=0
+export AGRIF_NAMES=""
+
+#-------------------------------------------------------------------------------
+#  Time Steps
+#-------------------------------------------------------------------------------
+export TSP_ATM=360
+export TSP_OCE=800
+export TSP_ICE=$(( 3 * $TSP_OCE ))
+export CPL_FREQ=7200
+
+#-------------------------------------------------------------------------------
+#  Various
+#-------------------------------------------------------------------------------
+export DEBUG="FALSE"     
+export SCRIPT_DEBUG="FALSE"     
+export LEVITUS=1  # for init state  ... si demarrage climato (levitus ou autre)
+export TRDMLD=0
+
+#-------------------------------------------------------------------------------
+#  1 experiment / n jobs
+#-------------------------------------------------------------------------------
+# The experiment is divided into jobs (called with "llsubmit" command)
+
+#                                                           Period of Experiment
+export YEAR_BEGIN_EXP=1990
+export MONTH_BEGIN_EXP=1
+export DAY_BEGIN_EXP=1
+#                                                     Duration of the Experiment
+#export EXP_DUR_MTH=$(( 12 * 5 ))
+export EXP_DUR_MTH=0
+export EXP_DUR_DAY=3
+#                                                                  Period of Job
+export YEAR_BEGIN_JOB=1990
+export MONTH_BEGIN_JOB=1
+export DAY_BEGIN_JOB=1
+#                                                            Duration of the Job
+export JOB_DUR_MTH=0
+export JOB_DUR_DAY=1
+
+# MODE_TEST: extension du nom de l'experience
+#            pour tourner differents tests dans la meme experience
+# on peut lancer plusieurs tests en même temps mais pas être en production et lancer des tests
+ export         MODE_TEST=""    #   mode Production 
+#export         MODE_TEST=".nouvelle_PHYSIQUE" 
+
+
+#-------------------------------------------------------------------------------
+#  Name and directory of the experiment (from the path of the experiment)
+#-------------------------------------------------------------------------------
+export CEXPER=`pwd | awk -F"/" '{print $(NF-1)}'`
+PWD1=$(pwd)
+export    RUNDIR=${PWD1%/*}
+export MODELE=`pwd | awk -F"/" '{print $(NF-3)}'| awk -F"_" '{print $(2)}'`
+
+#-------------------------------------------------------------------------------
+#  Directories
+#-------------------------------------------------------------------------------
+export  JOBDIR_ROOT=${RUNDIR}/jobs
+export    SCRIPTDIR=${RUNDIR}/scripts
+export      COMPDIR=${RUNDIR}/compile/${MODELE}
+export     PARAMDIR=${RUNDIR}/param_inputs
+
+#-------------------------------------------------------------------------------
+#  Calendar computation
+#-------------------------------------------------------------------------------
+cd ${SCRIPTDIR}
+   . ./caltools.sh
+cd - 
+
+#-------------------------------------------------------------------------------
+#  Names
+#-------------------------------------------------------------------------------
+export    ROOT_NAME_1="${CEXPER}_${DATE_BEGIN_JOB}_${DATE_END_JOB}${MODE_TEST}"
+export              ROOT_NAME_2="${DATE_BEGIN_JOB}_${DATE_END_JOB}${MODE_TEST}"
+export                                ROOT_NAME_3="${DATE_END_JOB}${MODE_TEST}"
+export    jobname="job_${ROOT_NAME_1}.sh"
+
+
+#-------------------------------------------------------------------------------
+#  Which Computer?
+#-------------------------------------------------------------------------------
+if [ `hostname  |cut -c 1-5` == "curie" ]; then
+   export QSUB="ccc_msub"
+   export COMPUTER="CURIE"
+elif [ `hostname  |cut -c 1-6` == "vargas" ]; then
+   export QSUB="llsubmit"
+   export COMPUTER="VARGAS"
+else
+#elif [ `hostname  |cut -c 1-7` == "service" ]; then 
+   export QSUB="qsub"
+   export COMPUTER="JADE"
+fi

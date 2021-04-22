@@ -1,0 +1,75 @@
+#-------------------------------------------------------------------------------
+#                                                                      Restart
+#-------------------------------------------------------------------------------
+
+if [ ${DATE_BEGIN_JOB} -eq ${DATE_BEGIN_EXP} ]; then
+  if [ ${LEVITUS} -eq 0 ]; then     #  on débute l'exp�rience à partir d'un restart existant.
+
+#  printf "\n\n\n  ATTENTION!!!   Quels restarts???  \n\n\n"; exit 
+#  ${io_getfile} ${INPUTDIR}/rst/restart.obc.68    restart.obc
+#  ${io_getfile} ${INPUTDIR}/rst/restart.nc.68     restart_oce.nc
+   for file in `${MACHINE_STOCKAGE} ls /u/rech/tij/rtij004/peru12_nemo/restarts/erai201v/19890102/restart_oce_erai201v_19890102_????.nc`
+   do
+     ${io_getfile} ${file} restart_oce_${file##*_}
+   done
+
+  fi
+
+else   
+
+#
+# nemo
+#
+        nn=0
+        while [ ${nn} -le ${AGRIFZ} ]
+        do
+        [ ${nn} -eq 0 ] && pref="" || pref=${nn}_
+
+#
+# oce restarts
+#
+#  curie + jade
+#           for i in ${RESTDIR_IN}/${pref}restart_oce_${CEXPER}_*_????.nc
+#  vargas
+
+#   
+            for file in `${MACHINE_STOCKAGE} ls ${RESTDIR_IN}/${pref}restart_oce_${CEXPER}_*_????.nc`
+#           for file in `${MACHINE_STOCKAGE} ls ${RESTDIR_IN}/${pref}restart_oce_${CEXPER}_*_????.nc ; exit`
+#           for file in ${RESTDIR_IN}/${pref}restart_oce_${CEXPER}_*_????.nc
+            do
+              ${io_getfile} ${file} ${pref}restart_oce_${file##*_}
+            done
+
+#
+# obc restarts
+# CHRIS gerer avec IF ln_obc_rstart
+#           ${io_getfile} ${RESTDIR_IN}/${pref}restart_obc_${CEXPER}_*  ${pref}restart.obc
+
+#
+# mld restarts
+#
+# CHRIS:  tout mettre dans la boucle  (comme 'oce restarts')!!!!
+#       if [ ${TRDMLD} -eq 1 ] ; then
+            #${io_getfile} ${RESTDIR_IN}/${pref}restart_mld_${CEXPER}_*_????.nc .
+            #for i in ${pref}restart_mld_${CEXPER}_*_????.nc
+            #do
+            #mv -f $i ${pref}restart_mld_${i##*_}
+            #done
+        #fi
+          nn=$(( ${nn} + 1 ))
+        done
+
+#
+# ice restarts
+#
+# CHRIS:  tout mettre dans la boucle  (comme 'oce restarts')!!!!
+#           if [ ${USE_ICE} -eq 1 ] ; then 
+#             ${io_getfile} ${RESTDIR_IN}/restart_ice_${CEXPER}_*_????.nc .
+#             for i in restart_ice_${CEXPER}_*_????.nc
+#             do
+#               mv -f $i restart_ice_${i##*_}
+#             done
+#           fi
+# initial state read in the getfile.sh script
+#       else    
+fi
