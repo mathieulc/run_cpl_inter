@@ -2,10 +2,14 @@
 #                                                                      Average
 #-------------------------------------------------------------------------------
 
-mv wrfout.nc ${CEXPER}_1d_${DATE_BEGIN_JOB}_${DATE_END_JOB}_wrfout.nc
-rm -f wrfout_d01_${YEAR_BEGIN_JOB}-*
-mv section_20s.nc ${CEXPER}_1h_${DATE_BEGIN_JOB}_${DATE_END_JOB}_section_20s.nc
-mv wrfhf2d.nc ${CEXPER}_1h_${DATE_BEGIN_JOB}_${DATE_END_JOB}_wrfhf2d.nc
+
+for dom in `seq $NB_dom`; do
+    mv wrfout_d0${dom}_${YEAR_BEGIN_JOB}-* ${CEXPER}_1d_${DATE_BEGIN_JOB}_${DATE_END_JOB}_wrfout_d0${dom}.nc
+    mv wrfxtrm_d0${dom}_${YEAR_BEGIN_JOB}-* ${CEXPER}_1d_${DATE_BEGIN_JOB}_${DATE_END_JOB}_wrfxtrm_d0${dom}.nc
+
+    rm -f wrfout_d0${dom}_${YEAR_BEGIN_JOB}-*
+    rm -f wrfxtrm_d0${dom}_${YEAR_BEGIN_JOB}-*
+
 #-------------------------------------------------------------------------------
 #                                                                      Restart
 #-------------------------------------------------------------------------------

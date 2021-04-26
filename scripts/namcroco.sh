@@ -39,11 +39,11 @@ do
     if [ ${nn} -gt 0 ] 
     then
 	namfile=croco.in.${nn}
-	cp ${nn}_namelist.base.oce ${namfile}
+	cp ${CROCO_IN_DIR}/${nn}_croco.in.base ${namfile}
 	SUBTIME=$( sed -n -e "$(( 2 * ${nn} )) p" AGRIF_FixedGrids.in | awk '{print $7 }' )
     else
 	namfile=croco.in
-	cp namelist.base.oce ${namfile}
+	cp ${CROCO_IN_DIR}/croco.in.base ${namfile}
 	SUBTIME=1
     fi
     TSP_OCE_2=$(( ${TSP_OCE} / ${SUBTIME} ))
@@ -60,11 +60,17 @@ do
 #
     DATE0="${DATE_BEGIN_JOB}"
 #
-    sed -e "s/<dt>/${TSP_OCE_2}/"     \
-	-e "s/<ntimes>/${OCE_NTIMES}/"     \
-	-e "s/<ntimeshis>/$(( 2 * ${OCE_NTIMES} ))/"     \
-	-e "s/<ntimesavg>/${OCE_NTSP_DAY}/"     \
-	${namfile} > namelist.tmp
+#    sed -e "s/<dt>/${TSP_OCE_2}/"     \
+#	-e "s/<ntimes>/${OCE_NTIMES}/"     \
+#	-e "s/<ntimeshis>/$(( 2 * ${OCE_NTIMES} ))/"     \
+#	-e "s/<ntimesavg>/${OCE_NTSP_DAY}/"     \
+#	${namfile} > namelist.tmp
+
+sed -e "s/<ocentimes>/${OCE_NTIMES}/g" -e "s/<ocedt>/${TSP_OCE_2}/g"   -e "s/<ocendtfast>/${TSP_OCEF}/g" \
+    -e "s/<oce_nrst>/${OCE_NTIMES}/g"   -e "s/<oce_nhis>/${oce_nhis}/g" -e "s/<oce_navg>/${oce_navg}/g"     \
+    -e "s/<yr1>/${YEAR_BEGIN_JOB}/g"             -e "s/<mo1>/${MONTH_BEGIN_JOB}/g"           \
+    -e "s/<yr2>/${YEAR_END_JOB}/g"             -e "s/<mo2>/${MONTH_END_JOB}/g"           \
+    ${namfile} > namelist.tmp
 
     mv namelist.tmp ${namfile}
 #

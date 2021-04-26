@@ -47,6 +47,11 @@ elif [ `hostname  |cut -c 1-6` == "vargas" ]; then
   module load netcdf/4.1.3-par
   module load phdf5/1.8.7
 
+elif [ `hostname  |cut -c 1-8` == "datarmor" ]; then
+  export MACHINE="DATARMOR"
+  module purge
+  source run_env
+  
 else
   printf "\n\n Machine unknown  => EXIT \n\n"; exit;
 fi

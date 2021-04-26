@@ -1,0 +1,63 @@
+#!/bin/bash
+#===============================================================================
+#                      header to submit a MPI batch job 
+#===============================================================================
+
+#PBS -q mpi_<nmpi>       # request name
+#PBS -l walltime=24:00:00
+#PBS -N <exp> 
+
+cd $PBS_O_WORKDIR
+#===============================================================================
+
+umask 022
+set -u
+set +x   #  set -x par defaut sur Curie
+
+
+# < insert here variables definitions > !!! DO NOT REMOVE THIS LINE (used by submitjob) !!!
+
+
+#############################   from header.DATARMOR  #############################
+#===============================================================================
+#  only for DATARMOR  
+#===============================================================================
+
+#-------------------------------------------------------------------------------
+#  where do we get the input files?
+#-------------------------------------------------------------------------------
+export INPUTDIRO=$CROCO_FILES_DIR
+export INPUTDIRA=$WRF_FILES_DIR
+export INPUTDIRW=$WW3_FILES_DIR
+export INPUTDIRC=$OASIS_FILES_DIR
+
+#-------------------------------------------------------------------------------
+#  where do we execute the job?
+#-------------------------------------------------------------------------------
+export EXEDIR_ROOT="${SCRATCHDIR}/${CONFIG}/execute"
+
+#-------------------------------------------------------------------------------
+#  where do we store the output files?
+#-------------------------------------------------------------------------------
+export OUTPUTDIR_ROOT="${SCRATCHDIR}/${CONFIG}/outputs"
+export RESTDIR_ROOT="${SCRATCHDIR}/${CONFIG}/restarts"
+
+#-------------------------------------------------------------------------------
+#  To run the models
+#-------------------------------------------------------------------------------
+#export EXEC="time -p ccc_mprun ./nemo.exe"
+#export EXEC="time -p mpirun -np 64  ./nemo.exe"
+#export EXEC="time -p mpirun -np 64  ./nemo.exe  :  -np 1 ./xios_server.exe"
+#export EXEC="time -p ccc_mprun -n $(( $JPNI * $JPNJ )) ./nemo.exe  :  -n $NXIOS ./xios_server.exe"
+
+#-------------------------------------------------------------------------------
+#  define the function to get/put files
+#-------------------------------------------------------------------------------
+export io_getfile="lnfile"
+export io_putfile="mvfile"
+
+#-------------------------------------------------------------------------------
+#  Multi-Step
+#-------------------------------------------------------------------------------
+LOADL_STEP_NAME="XXX"
+

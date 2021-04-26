@@ -7,7 +7,7 @@ umask 022
 #-------------------------------------------------------------------------------
 #  Which Computer and modules?
 #-------------------------------------------------------------------------------
-. ./module.sh
+. ./module.sh # To eddit
 #-------------------------------------------------------------------------------
 #  namelist of the experiment
 #-------------------------------------------------------------------------------
@@ -28,9 +28,10 @@ cd -
 #-------------------------------------------------------------------------------
 # calendar computations (to check dates consistency)
 #-------------------------------------------------------------------------------
-if [ ${USE_CPL} -eq 1 ]; then
+if [ ${USE_CPL} -ge 1 ]; then
   if [ $(( ${CPL_FREQ} % ${TSP_ATM} )) -ne 0 ] || \
      [ $(( ${CPL_FREQ} % ${TSP_OCE} )) -ne 0 ] || \
+     [ $(( ${CPL_FREQ} % ${TSP_WW3} )) -ne 0 ] || \
      [ $(( ${CPL_FREQ} % ${TSP_ICE} )) -ne 0 ] ; then
      printf "\n\n Problem of consistency between Coupling Frequency and Time Step, we stop...\n\n" && exit 1
   fi
@@ -42,10 +43,12 @@ fi
 # create job and submit it
 #-------------------------------------------------------------------------------
 
-[ ${USE_OCE}  -eq 1 ] && TOTOCE=$((    $JPNI *    $JPNJ )) || TOTOCE=0
-[ ${USE_ATM}  -eq 1 ] && TOTATM=$(( $NPROC_X * $NPROC_Y )) || TOTATM=0
+[ ${USE_OCE}  -eq 1 ] && TOTOCE=$NP_CRO || TOTOCE=0
+[ ${USE_ATM}  -eq 1 ] && TOTATM=$NP_WRF || TOTATM=0
+[ ${USE_WW3}  -eq 1 ] && TOTATM=$NP_WW3 || TOTWW3=0
 [ ${USE_XIOS} -eq 0 ] && NXIOS=0
-totalcore=$(( $TOTOCE + $TOTATM + $NXIOS ))
+totalcore=$(( $TOTOCE + $TOTATM + $TOTWW3 + $NXIOS ))
+[ `hostname  |cut -c 1-8` == "datarmor" ] && totalcore=$(( $totalcore /29 +1)) 
 sed -e "/< insert here variables definitions >/r namelist_exp.tmp" \
     -e "s/<exp>/${ROOT_NAME_1}/g" \
     -e "s/<nmpi>/${totalcore}/g" \

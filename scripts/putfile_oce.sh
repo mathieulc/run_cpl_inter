@@ -3,7 +3,7 @@
 #                                                                      Average
 #-------------------------------------------------------------------------------
 
-for ff in avg.*nc
+for ff in croco_his.nc croco_avg.nc
 do
     mv $ff ${CEXPER}_1d_${DATE_BEGIN_JOB}_${DATE_END_JOB}_$ff
 done
